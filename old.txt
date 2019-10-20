@@ -1,0 +1,195 @@
+using System;
+namespace Calculator
+{
+    class program
+    {
+        static void Main(string[] args)
+        {
+            int a = 42;
+            int b = 69;
+            int c = a + b;
+
+            Console.WriteLine("Res: " + c);
+            Console.ReadKey();
+        }
+    }
+}
+
+#include <iostream>
+#include <cstring>
+#include <windows.h>
+#include <stdlib.h>
+#include <cmath>
+#include <ctime>
+#include <sstream>
+using namespace std;
+
+FLASHWINFO info;
+
+std::string FLAG_TIMER[] = {"-timer", "-t", "-countdown", "-cd"};
+std::string FLAG_STOPWATCH[] = {"-stopwatch", "-sw"};
+std::string FLAG_HELP[] = {"-help", "-h",};
+
+string getCurrentTime();
+string getString(char x);
+int comp(string s1, string s2);
+int startTimer(float time, string msg);
+int startStopWatch();
+
+// Main takes in arguments and runs according to what commands are given.
+int main(int argC, char** argV)
+{
+    if(argC > 1)
+    {
+        for(int i = 1; i < argC; i++)
+        {
+            // High level command for starting timer in new terminal window
+            if(comp(argV[i], "-timer") || comp(argV[i], "-t"))
+            {
+                int skipIndex = 0;
+                float time = atof(argV[i + 1]);
+                if(time && time > 0 && time < 9999)
+                {
+                    string msg;
+                    if(argV[i + 2] && !comp(getString(argV[i + 2][0]), "-"))
+                    {
+                        msg = argV[i + 2];
+                        skipIndex++;
+                    }
+                    else
+                        msg = "One of your timers (" + string(argV[i + 1]) + " minutes) have finished!";
+
+                    cout << "Your timer will start in a new window. " << endl;
+                    string shell = "start " + string(argV[0]) + " -startTimer " + string(argV[i + 1]) + " \"" + msg + "\"";
+                    const char* constShell = shell.c_str();
+                    system(constShell);
+
+                    skipIndex++;
+                    i += skipIndex;
+                }
+                else
+                    cout << "Error getting time, please run with \"-h\" or see readme.md for more info." << endl;
+            }
+            // Starts the timer (in current terminal window)
+            else if(comp(argV[i], "-startTimer"))
+            {
+                startTimer(atof(argV[i + 1]), string(argV[i + 2]));
+            }
+            // High level command for starting stop watch in new terminal window
+            else if(comp(argV[i], "-stopwatch") || comp(argV[i], "-sw"))
+            {
+                cout << "Your stopwatch will start in a new window. " << endl;
+
+                string shell = "start " + string(argV[0]) + " -startStopwatch";
+                const char* constShell = shell.c_str();
+                system(constShell);
+            }
+            else if(comp(argV[i], "-startStopwatch"))
+            {
+                startStopWatch();
+            }
+            // Prints help (readme.md usage content)
+            else if(comp(argV[i], "-help") || comp(argV[i], "-h"))
+            {
+                cout << "Flags:" << endl;
+                cout << "- -time, -t + [time] + \"[message]\": sets a timer for [time] value in minutes with the message [message]" << endl;
+                cout << "\t- Examples:" << endl;
+                cout << "\t\t- Set a timer for 8.5 minutes: $ ./timer.exe -t 510 \"Eggs are done\"" << endl;
+                cout << "\t\t- Set a timer for 1 hour: $ ./timer.exe -t 3600 \"Remember to stand up every hour\"" << endl;
+                cout << "- -stopwatch, -sw: starts a stopwatch" << endl;
+                cout << "- -help, -h: prints this usage guide" << endl;
+
+                continue;
+            }
+            // Unknown flag
+            else if(comp(getString(argV[i][0]), "-"))
+                cout << "Unknown flag: " << argV[i] << endl;
+        }
+    }
+    else
+        cout << "Too few arguments." << endl;
+
+    return 0;
+}
+
+// Gets current local hour:min:sec
+string getCurrentTime()
+{
+    ostringstream os;
+    time_t t = time(NULL);
+    tm* timePtr = localtime(&t);
+    os << (timePtr->tm_hour) << ":" << (timePtr->tm_min) << ":" << (timePtr->tm_sec);
+    return os.str();
+}
+
+// Returns string cast of char
+// Method from https://www.geeksforgeeks.org/how-to-convert-a-single-character-to-string-in-cpp/
+string getString(char x) 
+{ 
+    string s(1, x); 
+  
+    return s;    
+}
+
+// Returns result of compare of two strings, 1 = equal, else not equal (easier to use for boolean checks)
+int comp(string s1, string s2)
+{
+    return s1.compare(s2) == 0;
+    // return to_string(s1).compare(to_string(s2)) == 0;
+}
+
+int startTimer(float time, string msg)
+{
+    // Flash icon on taskbar
+    HWND hwnd =  GetConsoleWindow();
+    info.cbSize = sizeof(info);
+    info.hwnd = hwnd;
+    info.dwFlags = FLASHW_ALL;
+    info.dwTimeout = 0;
+    info.uCount = 1;
+
+    float limit = time * 60;
+
+    cout << getCurrentTime() << " - Timer set for " << to_string(time) << " minutes, message: \"" << msg << "\"\n";
+    
+    // Countdown in seconds
+    while(limit > 0)
+    {
+        limit--;
+        Sleep(1 * 1000);
+        cout << "\t" << limit << " seconds left." << "\r" << flush;
+    }
+
+    FlashWindowEx(&info);
+
+    // Windows alert sound
+    // cout << '\a';
+
+    // Some notes
+    Beep(523, 300);
+    Beep(323, 300);
+    Beep(523, 300);
+    Beep(623, 300);
+
+    cout << getCurrentTime() << " - Timer finished after " << to_string(time) << " minutes.\n";
+    cout << "\t" << msg << endl;
+    
+    system("PAUSE");
+
+    return 0;
+}
+
+int startStopWatch()
+{
+    cout << getCurrentTime() + " - Stopwatch started.\n";
+    int t = 0;
+
+    while(t < 86400) // Max 24 hours
+    {
+        t++;
+        Sleep(1 * 1000);
+        cout << "\t" << t << " seconds have passed. " << "\r" << flush;
+    }
+
+    return 0;
+}

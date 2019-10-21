@@ -154,7 +154,7 @@ class program
 
                     // Update user on progress and start a new cmd window with the timer
                     Console.WriteLine("Your timer will start in a new window.");
-                    System.Diagnostics.Process.Start("cmd.exe", "/c timer.exe -startTimer " + time + " " + message);
+                    System.Diagnostics.Process.Start("cmd.exe", "/c mode con:cols=96 lines=8 && timer.exe -startTimer " + time + " " + message);
 
                     // Depending on what has been added for the arguments, update i so we can skip going though all the same arguments again
                     i += skipIndex;

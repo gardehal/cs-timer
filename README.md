@@ -29,7 +29,6 @@ Note: ? indicates optional arguments.
 ## TODO
 
 - Flashing icon or bringing visual attention to window
-- Resize window to fit better for small text usage
 - stopwatch
 - timer + time/message in window title box
 - make program ignore when clicking somewhere in window, disrupting timer

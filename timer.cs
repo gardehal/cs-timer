@@ -1,8 +1,6 @@
 using System;
-using System.IO;
 using System.Diagnostics;
 using System.Threading;
-using System.Media;
 
 class program 
 {
@@ -11,18 +9,16 @@ class program
         parseArguments(args);
     }
 
+    // This menthod sets the timer, counts down, and alerts the user when finished
+    // Note that time is a string, to allow arguments to pass though the command line as arguments
     static void setTimer(string time, string message)
     {
-        // String msg = message;
-        if(message == "Heur.AdvML.B.")
-        {
-            message = "Your timer for " + time + " minutes expired.";
-        }
-
         DateTime dateTimeStarted = DateTime.Now;
 
         float limitMax = float.Parse(time) * 60;
-        float limit = limitMax;
+        int limit = (int)Math.Ceiling(limitMax);
+
+        // Timer cycle: write some info, sleep for 1 second, clear, reduce the limit and repeat until limit is reached
         while(limit > 0)
         {
             Console.WriteLine(dateTimeStarted + "\tTimer started, message: " + message);
@@ -33,16 +29,20 @@ class program
             limit--;
         }
 
+        // Timer is finished, get new dateTime and update user
         DateTime dateTimeFinished = DateTime.Now;
         Console.WriteLine(dateTimeStarted + "\tTimer started, message: " + message);
-        Console.WriteLine(dateTimeFinished + "\t Your timer finished after " + time + " minutes (" + limitMax + " seconds), message: " + message);
+        Console.WriteLine(dateTimeFinished + "\tYour timer finished after " + time + " minutes (" + limitMax + " seconds);");
+        Console.WriteLine("\t" + message + "\n");
         
+        // Some beeps
         Console.Beep(523, 300);
         Console.Beep(323, 300);
         Console.Beep(523, 300);
         Console.Beep(623, 300);
 
-        Console.WriteLine("Press any key to close this window.");
+        // Akin to the "pause" in cmd
+        Console.WriteLine("Press any key to close this window . . .");
         Console.ReadKey();
     }
 
@@ -64,33 +64,71 @@ class program
         {
             // Iterate over all arguments
             for(int i = 0; i < argC; i++)
-            {                
+            {         
+                // Console.WriteLine("i" + i + ": " + args[i]);
+
                 // Set deal with arguments and start timer 
                 if(args[i] == "-timer" || args[i] == "-t")
                 {
+                    // Initate defaults
                     int skipIndex = 0;
                     float time = 0;
-                    string message = "Heur.AdvML.B.";
+                    string message = "Heur.AdvML.B."; // Placeholder message, value is the code my Anti Virus gave the program when I tried to compile.
+
+                    // Missing time argument, continue
+                    if((i + 1) >= argC)
+                    {
+                        Console.WriteLine("Invalid argument, timer needs a time for countdown.");
+                        continue;
+                    }
 
                     try
                     {
-                        time = float.Parse(args[i + 1]);
+                        // Run a loop to check for "h", "m", and "s" with a numberargument after. 
+                        // "h" will multiply input to hours, "m" is just minutes, and "s" will divide to seconds
+                        // Should no h/m/s be found, use default (minutes)
+                        bool useTimeVariable = false;
                         
-                        // Skip over time argument
-                        skipIndex++;
+                        for(int j = (i + 1); j < argC; j++)
+                        {
+                            // Console.WriteLine("j" + j + ": " + args[j]);
+
+                            if(args[j][0] == Char.Parse("-"))
+                                break;
+                            else if(args[j] == "h" && (j + 1) < argC)
+                            {
+                                time += float.Parse(args[j + 1]) * 60;
+                                j++;
+                                skipIndex += 2;
+                                useTimeVariable = true;
+                            }
+                            else if(args[j] == "m" && (j + 1) < argC)
+                            {
+                                time += float.Parse(args[j + 1]);
+                                j++;
+                                skipIndex += 2;
+                                useTimeVariable = true;
+                            }
+                            else if(args[j] == "s" && (j + 1) < argC)
+                            {
+                                time += float.Parse(args[j + 1]) / 60;
+                                j++;
+                                skipIndex += 2;
+                                useTimeVariable = true;
+                            }
+                        }
+
+                        // No h/m/s arguments, use the number given
+                        if(!useTimeVariable)
+                        {
+                            time = float.Parse(args[i + 1]);
+                            skipIndex++;
+                        }
                     }
                     catch
                     {
                         Console.WriteLine("Invalid time for timer, must be a number.");
                         continue;
-                    }
-
-                    // If there is a message after the time argument, override default message.
-                    if((i + 2) < argC && args[i + 2][0] != Char.Parse("-"))
-                    {
-                        message = "\"" + args[i + 2] + "\"";
-                        // Skip over message argument
-                        skipIndex++;
                     }
 
                     if(time < 0 || time > 9999)
@@ -99,9 +137,26 @@ class program
                         continue;
                     }
 
+                    // If there is a message after the time argument, override default message
+                    int messageIndex = i + skipIndex + 1;
+                    if(messageIndex < argC && args[messageIndex][0] != Char.Parse("-"))
+                    {
+                        message = "\"" + args[messageIndex] + "\"";
+                        // Next argument iteration, skip over message argument
+                        skipIndex++;
+                    }
+                    
+                    // Set new message with time
+                    if(message == "Heur.AdvML.B.")
+                    {
+                        message = "\"Your timer for " + time + " minutes expired.\"";
+                    }
+
+                    // Update user on progress and start a new cmd window with the timer
                     Console.WriteLine("Your timer will start in a new window.");
                     System.Diagnostics.Process.Start("cmd.exe", "/c timer.exe -startTimer " + time + " " + message);
 
+                    // Depending on what has been added for the arguments, update i so we can skip going though all the same arguments again
                     i += skipIndex;
                 }
                 // Start timer

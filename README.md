@@ -11,24 +11,28 @@ A C# program with possibility to set multiple asynchronous timers.
 
 Alternativly, download the .exe and run from commandline like point 5.
 
+<pre>
 Flags:
-- -time, -t + [time] + "[message]": sets a timer for [time] value in minutes with the message [message]
+Note: ? indicates optional arguments.
+- -timer, -t + ?[time-unit] + [time] + ?"[message]": sets a timer for [time] with [time-unit] value in minutes with the message [message]
     - Examples: 
-        - Set a timer for 8.5 minutes: $ ./timer.exe -t 8.5 "Eggs are done"
-        - Set a timer for 1 hour: $ ./timer.exe -t 60 "Remember to stand up every hour"
+        - Set a timer for 10 seconds:                       $ ./timer.exe -t s 10 "Count to 10 finished"
+        - Set a timer for 8.5 minutes:                      $ ./timer.exe -t m 8.5 "Eggs are done"
+        - Set a timer for 1 hour:                           $ ./timer.exe -t h 1 "Remember to stand up every hour"
+        - Set a timer for 5 minutes:                        $ ./timer.exe -t 5 alarm
+        - Set a timer for 2 hours, 30 minutes, 15 seconds:  $ ./timer.exe -t h 2 m 30 s 15
 - -stopwatch, -sw: starts a stopwatch
 - -help, -h: prints this usage guide
+</pre>
 
 
 ## TODO
 
 - Flashing icon or bringing visual attention to window
 - Resize window to fit better for small text usage
-- option to use seconds/minutes/hours
 - stopwatch
 - timer + time/message in window title box
 - make program ignore when clicking somewhere in window, disrupting timer
-- clean up "using.."
 - spellcheck
 
 ## My Thoughts

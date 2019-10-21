@@ -1,0 +1,28 @@
+// For using maths to set hours and seconds 
+
+
+                    try
+                    {
+                        // Using multiplication or division to set time, i.e. 60*3 = 180 minutes or 3 hours, or 3/60 = 3 seconds
+                        string timeArgument = args[i + 1];
+                        if(args[i + 1].Contains("*"))
+                        {
+                            var multiplyArray = timeArgument.Split("*".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                            time = float.Parse(multiplyArray[0]) * float.Parse(multiplyArray[1]);
+                        }
+                        else if(args[i + 1].Contains("/"))
+                        {
+                            var divideArray = timeArgument.Split("/".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                            time = float.Parse(divideArray[0]) / float.Parse(divideArray[1]);
+                        }
+                        else
+                            time = float.Parse(timeArgument);
+                        
+                        // Next argument iteration, skip over time argument
+                        skipIndex++;
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Invalid time for timer, must be a number.");
+                        continue;
+                    }

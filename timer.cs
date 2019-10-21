@@ -9,53 +9,7 @@ class program
         parseArguments(args);
     }
 
-    // This menthod sets the timer, counts down, and alerts the user when finished
-    // Note that time is a string, to allow arguments to pass though the command line as arguments
-    static void setTimer(string time, string message)
-    {
-        DateTime dateTimeStarted = DateTime.Now;
-
-        float limitMax = float.Parse(time) * 60;
-        int limit = (int)Math.Ceiling(limitMax);
-
-        // Timer cycle: write some info, sleep for 1 second, clear, reduce the limit and repeat until limit is reached
-        while(limit > 0)
-        {
-            Console.WriteLine(dateTimeStarted + "\tTimer started, message: " + message);
-            Console.WriteLine("\t" + limit + " seconds left.");
-
-            Thread.Sleep(1 * 1000);
-            Console.Clear();
-            limit--;
-        }
-
-        // Timer is finished, get new dateTime and update user
-        DateTime dateTimeFinished = DateTime.Now;
-        Console.WriteLine(dateTimeStarted + "\tTimer started, message: " + message);
-        Console.WriteLine(dateTimeFinished + "\tYour timer finished after " + time + " minutes (" + limitMax + " seconds);");
-        Console.WriteLine("\t" + message + "\n");
-        
-        // Some beeps
-        Console.Beep(523, 300);
-        Console.Beep(323, 300);
-        Console.Beep(523, 300);
-        Console.Beep(623, 300);
-
-        // Akin to the "pause" in cmd
-        Console.WriteLine("Press any key to close this window . . .");
-        Console.ReadKey();
-    }
-
-    static int printHelp()
-    {
-        Console.WriteLine("Arguments:");
-        Console.WriteLine("- -time, -t + [time] + \"[message]\": sets a timer for [time] value in minutes with the message [message].");
-        Console.WriteLine("- -stopwatch, -sw: starts a stopwatch.");
-        Console.WriteLine("- -help, -h: prints this usage guide.");
-
-        return 0;
-    }
-
+    // Method for handleing arguments
     static void parseArguments(string[] args)
     {
         int argC = args.Length;
@@ -165,6 +119,19 @@ class program
                     setTimer((args[i + 1]), (args[i + 2]));
                     return;
                 }
+                // Deal with arguments for sw
+                else if(args[i] == "-stopWatch" || args[i] == "-sw")
+                {
+                    Console.WriteLine("Your stopwatch will start in a new window.");
+                    System.Diagnostics.Process.Start("cmd.exe", "/c mode con:cols=96 lines=8 && timer.exe -startStopWatch");
+                    continue;
+                }
+                // Start timer
+                else if(args[i] == "-startStopWatch")
+                {
+                    startStopWatch(0);
+                    return;
+                }
                 // Help print
                 else if(args[i] == "-help" || args[i] == "-h")
                 {
@@ -178,5 +145,89 @@ class program
         }
         else
             Console.WriteLine("Too few arguments! See readme.md or run with \"-h\" for help.");
+    }
+    
+    // This menthod sets the timer, counts down, and alerts the user when finished
+    // Note that time is a string, to allow arguments to pass though the command line as arguments
+    static void setTimer(string time, string message)
+    {
+        DateTime dateTimeStarted = DateTime.Now;
+
+        float limitMax = float.Parse(time) * 60;
+        int limit = (int)Math.Ceiling(limitMax);
+
+        // Timer cycle: write some info, sleep for 1 second, clear, reduce the limit and repeat until limit is reached
+        while(limit > 0)
+        {
+            Console.WriteLine(dateTimeStarted + "\tTimer started, message: " + message + " \n");
+            Console.WriteLine("\t" + limit + " seconds left.");
+
+            Thread.Sleep(1 * 1000);
+            Console.Clear();
+            limit--;
+        }
+
+        // Timer is finished, get new dateTime and update user
+        DateTime dateTimeFinished = DateTime.Now;
+        Console.WriteLine(dateTimeStarted + "\tTimer started, message: " + message);
+        Console.WriteLine(dateTimeFinished + "\tYour timer finished after " + time + " minutes (" + limitMax + " seconds);");
+        Console.WriteLine("\t" + message + "\n");
+        
+        // Some beeps
+        Console.Beep(523, 300);
+        Console.Beep(323, 300);
+        Console.Beep(523, 300);
+        Console.Beep(623, 300);
+
+        // Akin to the "pause" in cmd
+        Console.WriteLine("Press any key to close this window . . .");
+        Console.ReadKey();
+    }
+
+    // Method that starts a stopwatch
+    static void startStopWatch(int time = 0, DateTime? dateTimeStarted = null)
+    {
+        if(dateTimeStarted == null)
+            dateTimeStarted = DateTime.Now;
+
+        // do-while loop from https://www.reddit.com/r/csharp/comments/agd1rn/how_to_break_a_loop_in_c_by_pressing_ctrl_z_or/
+        // While user does not input Ctrl + Z, write info, sleep for 1 second, clear, increment time, and repeat
+        var key = default(ConsoleKeyInfo);
+        do 
+        {
+            while (!Console.KeyAvailable) 
+            {
+                Console.WriteLine(dateTimeStarted + "\tStopwatch started.\n");
+                Console.WriteLine("\t" + time + " seconds have passed.");
+                Thread.Sleep(1 * 1000);
+                Console.Clear();
+                time++;
+            }
+            key = Console.ReadKey();
+        } 
+        while(key.Key != ConsoleKey.Z || key.Modifiers != ConsoleModifiers.Control);
+
+        Console.Clear();
+
+        // Display updated info to user
+        Console.WriteLine(dateTimeStarted + "\tStopwatch started.\n");
+        Console.WriteLine("\t" + time + " seconds have passed.");
+
+        // Allow user to continue stopwatch, using  current time and dateTimeStarted, though recursion
+        Console.WriteLine("Continue stopwatch? (y/n) . . .");
+        var doContinue = Console.ReadKey();
+
+        if(doContinue.Key == ConsoleKey.Y)
+            startStopWatch(time, dateTimeStarted);
+    }
+
+    // Simple help print
+    static void printHelp()
+    {
+        Console.WriteLine("Note: ? indicates optional arguments.\n");
+        Console.WriteLine("Arguments:");
+        Console.WriteLine("- -timer, -t + ?[time-unit] + [time] + ?\"[message]\": sets a timer for [time] with [time-unit] value in minutes with the message [message]");
+        Console.WriteLine("- -stopwatch, -sw: starts a stopwatch (Ctrl + Z to pause)");
+        Console.WriteLine("- -help, -h: prints this usage guide");
     }
 }

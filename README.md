@@ -22,7 +22,7 @@ Arguments:
         - Set a timer for 1 hour:                           $ ./timer.exe -t h 1 "Remember to stand up every hour"
         - Set a timer for 5 minutes:                        $ ./timer.exe -t 5 alarm
         - Set a timer for 2 hours, 30 minutes, 15 seconds:  $ ./timer.exe -t h 2 m 30 s 15
-- -stopwatch, -sw: starts a stopwatch (Ctrl + Z to pause)
+- -stopwatch, -sw: starts a stopwatch (Spacebar to pause)
 - -help, -h: prints this usage guide
 </pre>
 

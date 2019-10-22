@@ -180,8 +180,12 @@ class program
         Console.Beep(623, 300);
 
         // Akin to the "pause" in cmd
-        Console.WriteLine("Press any key to close this window . . .");
-        Console.ReadKey();
+        Console.WriteLine("Press R to restart the timer . . .");
+        Console.WriteLine("Press any other key to close this window . . .");
+        var input = Console.ReadKey();
+
+        if(input.Key == ConsoleKey.R)
+            setTimer(time, message);
     }
 
     // Method that starts a stopwatch
@@ -205,7 +209,7 @@ class program
             }
             key = Console.ReadKey();
         } 
-        while(key.Key != ConsoleKey.Z || key.Modifiers != ConsoleModifiers.Control);
+        while(key.Key != ConsoleKey.Spacebar);
 
         Console.Clear();
 
@@ -227,7 +231,7 @@ class program
         Console.WriteLine("Note: ? indicates optional arguments.\n");
         Console.WriteLine("Arguments:");
         Console.WriteLine("- -timer, -t + ?[time-unit] + [time] + ?\"[message]\": sets a timer for [time] with [time-unit] value in minutes with the message [message]");
-        Console.WriteLine("- -stopwatch, -sw: starts a stopwatch (Ctrl + Z to pause)");
+        Console.WriteLine("- -stopwatch, -sw: starts a stopwatch (Spacebar to pause)");
         Console.WriteLine("- -help, -h: prints this usage guide");
     }
 }

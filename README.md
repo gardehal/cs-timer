@@ -33,6 +33,8 @@ Arguments:
 - timer + time/message in window title box
 - make program ignore when clicking somewhere in window, disrupting timer
 - spellcheck
+- Loop around beeps for continuous alarm until (window focus ?)
+- cmd in different icon group than main cli?
 
 ## My Thoughts
 

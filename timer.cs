@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
+using System.IO;
 
 class program 
 {
@@ -108,7 +109,10 @@ class program
 
                     // Update user on progress and start a new cmd window with the timer
                     Console.WriteLine("Your timer will start in a new window.");
-                    System.Diagnostics.Process.Start("cmd.exe", "/c mode con:cols=96 lines=8 && timer.exe -startTimer " + time + " " + message);
+                    string path = System.Reflection.Assembly.GetEntryAssembly().Location;
+                    
+                    string command = "/c mode con:cols=96 lines=8 && " + path + " -startTimer " + time + " " + message;
+                    System.Diagnostics.Process.Start("cmd.exe", command);
 
                     // Depending on what has been added for the arguments, update i so we can skip going though all the same arguments again
                     i += skipIndex;
@@ -123,7 +127,8 @@ class program
                 else if(args[i] == "-stopWatch" || args[i] == "-sw")
                 {
                     Console.WriteLine("Your stopwatch will start in a new window.");
-                    System.Diagnostics.Process.Start("cmd.exe", "/c mode con:cols=96 lines=8 && timer.exe -startStopWatch");
+                    string command = "/c mode con:cols=96 lines=8 && timer.exe -startStopWatch";
+                    System.Diagnostics.Process.Start("cmd.exe", command);
                     continue;
                 }
                 // Start timer
@@ -195,7 +200,7 @@ class program
             dateTimeStarted = DateTime.Now;
 
         // do-while loop from https://www.reddit.com/r/csharp/comments/agd1rn/how_to_break_a_loop_in_c_by_pressing_ctrl_z_or/
-        // While user does not input Ctrl + Z, write info, sleep for 1 second, clear, increment time, and repeat
+        // While user does not input Spacebar, write info, sleep for 1 second, clear, increment time, and repeat
         var key = default(ConsoleKeyInfo);
         do 
         {

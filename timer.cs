@@ -2,9 +2,17 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.IO;
+using System.Runtime.InteropServices;
 
 class program 
-{
+{   
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetForegroundWindow();
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    static extern bool SetForegroundWindow(IntPtr hWnd);
+
+
     static void Main(string[] args)
     {
         parseArguments(args);
@@ -127,7 +135,9 @@ class program
                 else if(args[i] == "-stopWatch" || args[i] == "-sw")
                 {
                     Console.WriteLine("Your stopwatch will start in a new window.");
-                    string command = "/c mode con:cols=96 lines=8 && timer.exe -startStopWatch";
+                    string path = System.Reflection.Assembly.GetEntryAssembly().Location;
+
+                    string command = "/c mode con:cols=96 lines=8 && " + path + " -startStopWatch";
                     System.Diagnostics.Process.Start("cmd.exe", command);
                     continue;
                 }

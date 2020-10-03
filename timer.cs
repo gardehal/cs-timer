@@ -147,6 +147,39 @@ class program
                     startStopWatch(0);
                     return;
                 }
+                // Convert
+                else if(args[i] == "-convert" || args[i] == "-c")
+                {
+                    if(i + 3 > argC) // Not enough args
+                    {
+                        Console.WriteLine("Not enough arguments.");
+                        return;
+                    }
+                    if(args[i + 1][0] == Char.Parse("-") || args[i + 2][0] == Char.Parse("-") || args[i + 3][0] == Char.Parse("-"))
+                    {
+                        Console.WriteLine("Invalid arguments, expecting [time-unit] + [time] + [to-time-unit] like: \"h 1 seconds\"");
+                        return;
+                    }
+
+                    var inSeconds = getTimeInSeconds(args[i + 1], args[i + 2]);
+                    if(inSeconds < 0)
+                    {
+                        Console.WriteLine("Invalid arguments, expecting [time-unit] + [time] + [to-time-unit] like: \"h 1 seconds\"");
+                        return;
+                    }
+
+                    var toUnit = args[i + 3];
+                    var result = convert(inSeconds, toUnit);
+
+                    if(result < 0)
+                    {
+                        Console.WriteLine("Invalid arguments, expecting [time-unit] + [time] + [to-time-unit] like: \"h 1 seconds\"");
+                        return;
+                    }
+
+                    Console.WriteLine(result + " " + toUnit);
+                    return;
+                }
                 // Help print
                 else if(args[i] == "-help" || args[i] == "-h")
                 {
@@ -240,6 +273,30 @@ class program
             startStopWatch(time, dateTimeStarted);
     }
 
+    static float convert(float timeInSeconds, string timeUnit)
+    {
+        if(timeUnit == "h")
+            return timeInSeconds / 3600F;
+        else if(timeUnit == "m")
+            return timeInSeconds / 60F;
+        else if(timeUnit == "s")
+            return timeInSeconds;
+        else
+            return -1F;
+    }
+
+    static float getTimeInSeconds(string timeUnit, string fromTime)
+    {
+        if(timeUnit == "h")
+            return float.Parse(fromTime) * 3600;
+        else if(timeUnit == "m")
+            return float.Parse(fromTime) * 60;
+        else if(timeUnit == "s")
+            return float.Parse(fromTime);
+        else
+            return -1F;
+    }
+
     // Simple help print
     static void printHelp()
     {
@@ -247,6 +304,7 @@ class program
         Console.WriteLine("Arguments:");
         Console.WriteLine("- -timer, -t + ?[time-unit] + [time] + ?\"[message]\": sets a timer for [time] with [time-unit] value in minutes with the message [message]");
         Console.WriteLine("- -stopwatch, -sw: starts a stopwatch (Spacebar to pause)");
+        Console.WriteLine("- -convert, -c: [time-unit] + [time] + [to-time-unit]: converts time from [time-unit] to [to-time-unit]");
         Console.WriteLine("- -help, -h: prints this usage guide");
     }
 }

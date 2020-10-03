@@ -19,6 +19,7 @@ Note: ? indicates optional arguments.
 | --- | --- | --- |
 | -timer, -t | ?[time-unit] + [time] + ?"[message]" | sets a timer for [time] with [time-unit] value in minutes with the message [message] |
 | -stopwatch, -sw | none | starts a stopwatch (Spacebar to pause) |
+| -convert, -c | [time-unit] + [time] + [to-time-unit] | converts time from [time-unit] to [to-time-unit] |
 | -help, -h | none | prints this usage guide |
 
 ### Examples
